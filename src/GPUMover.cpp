@@ -51,37 +51,31 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 
 
+	//Ex
 	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
 	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Ex_flat), &Ex_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
-
+	//ey
 	cudaMalloc(&Ey_flat, size * sizeof(FPfield));
 	cudaMemcpy(Ey_flat, emf->Ey_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Ey_flat), &Ey_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//ez
+	cudaMalloc(&Ez_flat, size * sizeof(FPfield));
+	cudaMemcpy(Ez_flat, emf->Ez_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Ez_flat), &Ez_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//bx
+	cudaMalloc(&Bxn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Bxn_flat, emf->Bxn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Bxn_flat), &Bxn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//by
+	cudaMalloc(&Byn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Byn_flat, emf->Byn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Byn_flat), &Byn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//bz
+	cudaMalloc(&Bzn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Bzn_flat, emf->Bzn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Bzn_flat), &Bzn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
 
-
-
-
-
-
-	/*
-	cudaMalloc(&(gpu_emf->Ex_flat), size * sizeof(FPfield));
-	cudaMalloc(&(gpu_emf->Ey_flat), size * sizeof(FPfield));
-	cudaMalloc(&(gpu_emf->Ez_flat), size * sizeof(FPfield));
-	cudaMalloc(&(gpu_emf->Bxn_flat), size * sizeof(FPfield));
-	cudaMalloc(&(gpu_emf->Byn_flat), size * sizeof(FPfield));
-	cudaMalloc(&(gpu_emf->Bzn_flat), size * sizeof(FPfield));
-
-
-
-	
-	cudaMemcpy(&(gpu_emf->Ex_flat), &(emf->Ex_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_emf->Ey_flat), &(emf->Ey_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_emf->Ez_flat), &(emf->Ez_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_emf->Bxn_flat), &(emf->Bxn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_emf->Byn_flat), &(emf->Byn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_emf->Bzn_flat), &(emf->Bzn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	*/
 	
 	}
 

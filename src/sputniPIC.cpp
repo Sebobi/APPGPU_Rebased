@@ -85,9 +85,14 @@ int main(int argc, char **argv){
 
 	grid *GPU_grid;
 	parameters *GPU_param;
+	EMfield *GPU_emf;
+
 
 	copyGrid(&grd, &GPU_grid, gridSize);
 	copyParam(&param, GPU_param);
+	copyEMfield(&field,GPU_emf,gridSize) {
+
+
     
     // **********************************************************//
     // **** Start the Simulation!  Cycle index start from 1  *** //

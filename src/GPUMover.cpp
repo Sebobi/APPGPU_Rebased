@@ -39,10 +39,20 @@ void copyParam(parameters *param, parameters *gpu_param) {
 void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 
+	FPfield* Ex_flat;
+
+
 	cudaMalloc(&gpu_emf, sizeof(EMfield));
+	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
 
 	cudaMemcpy(gpu_emf, emf, size*sizeof(EMfield), cudaMemcpyHostToDevice);
 
+	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPField), cudaMemcpyHostToDevice);
+
+
+
+
+	/*
 	cudaMalloc(&(gpu_emf->Ex_flat), size * sizeof(FPfield));
 	cudaMalloc(&(gpu_emf->Ey_flat), size * sizeof(FPfield));
 	cudaMalloc(&(gpu_emf->Ez_flat), size * sizeof(FPfield));
@@ -52,14 +62,16 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 
 
-
+	
 	cudaMemcpy(&(gpu_emf->Ex_flat), &(emf->Ex_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Ey_flat), &(emf->Ey_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Ez_flat), &(emf->Ez_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Bxn_flat), &(emf->Bxn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Byn_flat), &(emf->Byn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Bzn_flat), &(emf->Bzn_flat), size * sizeof(FPfield), cudaMemcpyHostToDevice);
-}
+	*/
+	
+	}
 
 
 void mallocParticles(struct particles *part, struct particles *gpu_particle, size_t size) {

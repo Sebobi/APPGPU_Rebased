@@ -30,6 +30,8 @@
 // Read and output operations
 #include "RW_IO.h"
 
+#include "GPUMover.h"
+
 
 int main(int argc, char **argv){
     

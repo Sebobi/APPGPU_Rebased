@@ -40,15 +40,27 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 
 	FPfield* Ex_flat;
-
+	FPfield* Ey_flat;
+	FPfield* Ez_flat;
+	FPfield* Bxn_flat;
+	FPfield* Byn_flat;
+	FPfield* Bzn_flat;
 
 	cudaMalloc(&gpu_emf, sizeof(EMfield));
-	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
-
 	cudaMemcpy(gpu_emf, emf, size*sizeof(EMfield), cudaMemcpyHostToDevice);
 
+
+
+	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
 	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_emf->Ex_flat), &Ex_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&Ey_flat, size * sizeof(FPfield));
+	cudaMemcpy(Ey_flat, emf->Ey_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Ey_flat), &Ey_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+
+
 
 
 

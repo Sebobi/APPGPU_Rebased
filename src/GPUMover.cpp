@@ -87,7 +87,7 @@ void mallocParticles(particles *part,particles **gpu_particle, particles *partic
 
 
 	cudaMalloc(gpu_particle, size * sizeof(particles));
-
+	/*
 	// Allocate memory for the dynamic arrays on the device.
 	for (size_t i = 0; i < size; i++) {
 		int npmax = part[i].npmax;
@@ -104,6 +104,7 @@ void mallocParticles(particles *part,particles **gpu_particle, particles *partic
 		cudaMalloc(&(particle_pointers[i].q), npmax * sizeof(FPpart));
 
 	}
+	*/
 	cudaMemcpy(&((*gpu_particle)[0]), &particle_pointers[0], size * sizeof(particles), cudaMemcpyHostToDevice);
 
 

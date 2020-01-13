@@ -90,7 +90,7 @@ int main(int argc, char **argv){
 
 	copyGrid(&grd, &GPU_grid, gridSize);
 	copyParam(&param, GPU_param);
-	copyEMfield(&field,GPU_emf,gridSize) {
+	copyEMfield(&field, GPU_emf, gridSize);
 
 
     

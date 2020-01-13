@@ -25,9 +25,9 @@ void copyGrid(grid *cpu_grid, grid **gpu_grid, size_t size){
 	cudaMemcpy(*gpu_grid, cpu_grid, sizeof(grid), cudaMemcpyHostToDevice);
 
 	// Restore pointers
-	grd->XN_flat = XN_flat;
-	grd->YN_flat = YN_flat;
-	grd->ZN_flat = ZN_flat;
+	cpu_grid->XN_flat = XN_flat;
+	cpu_grid->YN_flat = YN_flat;
+	cpu_grid->ZN_flat = ZN_flat;
 
 }
 

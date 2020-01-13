@@ -87,10 +87,16 @@ int main(int argc, char **argv){
 	parameters *GPU_param;
 	EMfield *GPU_emf;
 
+	particles *GPU_particles;
+	particles *particle_pointers;
+
+
 
 	copyGrid(&grd, &GPU_grid, gridSize);
 	copyParam(&param, GPU_param);
 	copyEMfield(&field, GPU_emf, gridSize);
+
+
 
 
     

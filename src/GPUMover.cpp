@@ -52,8 +52,11 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 
 	//Ex
+	//malloc space for pointer(array)
 	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
+	//fill array with values
 	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	//make our gpu_emf->ex_flat point to the address of ex_flat we just created.
 	cudaMemcpy(&(gpu_emf->Ex_flat), &Ex_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
 	//ey
 	cudaMalloc(&Ey_flat, size * sizeof(FPfield));
@@ -80,7 +83,7 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 	}
 
 
-void mallocParticles(struct particles *part, struct particles *gpu_particle, size_t size) {
+void mallocParticles(particles *part,particles *gpu_particle, particles *particle_pointers, size_t size) {
 
 	cudaMalloc(&gpu_particle, size * sizeof(particles));
 
@@ -105,7 +108,7 @@ void mallocParticles(struct particles *part, struct particles *gpu_particle, siz
 
 }
 
-void copyParticlesToGPU(struct particles *part, struct particles *gpu_particle, size_t size) {
+void copyParticlesToGPU(particles *part, particles *gpu_particle, particles *particle_pointers, size_t size) {
 
 	long npmax;
 
@@ -125,7 +128,7 @@ void copyParticlesToGPU(struct particles *part, struct particles *gpu_particle, 
 
 }
 
-void loadParticlesToCpu(particles *part, particles *gpu_particle, size_t size) {
+void loadParticlesToCpu(particles *part, particles *gpu_particle, particles *particle_pointers, size_t size) {
 	long npmax;
 
 	for (size_t i = 0; i < size; i++) {

@@ -6,7 +6,7 @@
 #include "Particles.h"
 
 
-void copyGrid(grid *cpu_grid,grid *gpu_grid, size_t size);
+void copyGrid(grid *cpu_grid,grid **gpu_grid, size_t size);
 
 void copyParam(parameters *param, parameters *gpu_param);
 

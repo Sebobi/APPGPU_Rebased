@@ -47,7 +47,7 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 	cudaMemcpy(gpu_emf, emf, size*sizeof(EMfield), cudaMemcpyHostToDevice);
 
-	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPField), cudaMemcpyHostToDevice);
+	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 
 
 

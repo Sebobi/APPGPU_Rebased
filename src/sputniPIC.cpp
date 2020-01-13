@@ -96,7 +96,7 @@ int main(int argc, char **argv){
 	copyParam(&param, GPU_param);
 	copyEMfield(&field, GPU_emf, gridSize);
 
-	mallocParticles(&part, GPU_particles, particle_pointers, numSpecies);
+	mallocParticles(part, GPU_particles, particle_pointers, numSpecies);
 
 
 

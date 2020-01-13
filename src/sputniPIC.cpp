@@ -83,9 +83,9 @@ int main(int argc, char **argv){
 	size_t gridSize = (grd.nxn*grd.nyn*grd.nzn);
 	int numSpecies = param.ns;
 
-	grid *GPU_grid;
+	grid GPU_grid;
 
-	//copyGrid(&grd, GPU_grid, gridSize);
+	copyGrid(&grd, &GPU_grid, gridSize);
     
     // **********************************************************//
     // **** Start the Simulation!  Cycle index start from 1  *** //

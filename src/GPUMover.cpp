@@ -1,5 +1,7 @@
 #include "GPUMover.h"
-
+#include "Grid.h"
+#include "EMfield.h"
+#include "Particles.h"
 
 
 void copyGrid(grid *cpu_grid, grid *gpu_grid, size_t size){
@@ -59,7 +61,7 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 }
 
 
-void mallocParticles(particles *part, particles *gpu_particle, size_t size) {
+void mallocParticles(struct particles *part, struct particles *gpu_particle, size_t size) {
 
 	cudaMalloc(&gpu_particle, size * sizeof(particles));
 
@@ -84,7 +86,7 @@ void mallocParticles(particles *part, particles *gpu_particle, size_t size) {
 
 }
 
-void copyParticlesToGPU(particles *part, particles *gpu_particle, size_t size) {
+void copyParticlesToGPU(struct particles *part, struct particles *gpu_particle, size_t size) {
 
 	long npmax;
 

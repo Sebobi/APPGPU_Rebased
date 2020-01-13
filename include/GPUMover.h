@@ -13,7 +13,7 @@ void copyParam(parameters *param, parameters *gpu_param);
 void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size);
 
 
-void mallocParticles(particles *part, particles *gpu_particle,particles *particle_pointers, size_t size);
+void mallocParticles(particles *part, particles **gpu_particle,particles *particle_pointers, size_t size);
 
 void copyParticlesToGPU(particles *part, particles *gpu_particle, particles *particle_pointers, size_t size);
 

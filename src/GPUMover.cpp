@@ -83,29 +83,29 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 	}
 
 
-void mallocParticles(particles *part,particles *gpu_particle, particles *particle_pointers, size_t size) {
+void mallocParticles(particles *part,particles **gpu_particle, particles *particle_pointers, size_t size) {
 
 
-	cudaMalloc(&gpu_particle, size * sizeof(particles));
+	cudaMalloc(gpu_particle, size * sizeof(particles));
 
-
-	//Move each particle over
-	for (int i = 0; i < size; i++) {
+	// Allocate memory for the dynamic arrays on the device.
+	for (size_t i = 0; i < size; i++) {
 		int npmax = part[i].npmax;
-		//start by copying info about particle over
-		cudaMemcpy(gpu_particle[i], part[i], sizeof(particles), cudaMemcpyHostToDevice);
-
-
-
-
-		//FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
-		/** q must have precision of interpolated quantities: typically double. Not used in mover */
-		//FPinterp* q;
-
-
-
+		particle_pointers[i].n_sub_cycles = part[i].n_sub_cycles;
+		particle_pointers[i].qom = part[i].qom;
+		particle_pointers[i].nop = part[i].nop;
+		particle_pointers[i].NiterMover = part[i].NiterMover;
+		cudaMalloc(&(particle_pointers[i].x), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].y), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].z), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].u), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].v), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].w), npmax * sizeof(FPpart));
+		cudaMalloc(&(particle_pointers[i].q), npmax * sizeof(FPpart));
 
 	}
+	cudaMemcpy(&((*gpu_particle)[0]), &particle_pointers[0], size * sizeof(particles), cudaMemcpyHostToDevice);
+
 
 
 }

@@ -75,7 +75,17 @@ int main(int argc, char **argv){
     
     // Initialization
     initGEM(&param,&grd,&field,&field_aux,part,ids);
-    
+
+
+
+	//initialize and load to GPU here
+
+	size_t gridSize = (grd.nxn*grd.nyn*grd.nzn);
+	int numSpecies = param.ns;
+
+	grid *GPU_grid;
+
+	copyGrid(grd, GPU_grid, gridSize);
     
     // **********************************************************//
     // **** Start the Simulation!  Cycle index start from 1  *** //

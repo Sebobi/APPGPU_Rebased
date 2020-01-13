@@ -93,7 +93,7 @@ void mallocParticles(particles *part,particles *gpu_particle, particles *particl
 	for (int i = 0; i < size; i++) {
 		int npmax = part[i].npmax;
 		//start by copying info about particle over
-		cudaMemcpy(gpu_particle[i], part[i], sizeof(particle), cudaMemcpyHostToDevice);
+		cudaMemcpy(gpu_particle[i], part[i], sizeof(particles), cudaMemcpyHostToDevice);
 
 
 

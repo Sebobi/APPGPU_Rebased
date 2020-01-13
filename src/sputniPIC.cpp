@@ -84,8 +84,10 @@ int main(int argc, char **argv){
 	int numSpecies = param.ns;
 
 	grid *GPU_grid;
+	parameters *GPU_param;
 
 	copyGrid(&grd, &GPU_grid, gridSize);
+	copyParam(&param, GPU_param);
     
     // **********************************************************//
     // **** Start the Simulation!  Cycle index start from 1  *** //

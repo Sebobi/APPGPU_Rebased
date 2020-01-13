@@ -6,25 +6,18 @@
 
 void copyGrid(grid *cpu_grid, grid **gpu_grid, size_t size){
 
-
+	//Copy over the grid to GPU
 	cudaMalloc(gpu_grid, sizeof(grid));
-
-	// Backup pointers
 	FPfield *XN_flat = cpu_grid->XN_flat;
 	FPfield *YN_flat = cpu_grid->YN_flat;
 	FPfield *ZN_flat = cpu_grid->ZN_flat;
-
-	// Allocate memory for the dynamic arrays on the device.
 	cudaMalloc(&(cpu_grid->XN_flat), size * sizeof(FPfield));
 	cudaMalloc(&(cpu_grid->YN_flat), size * sizeof(FPfield));
 	cudaMalloc(&(cpu_grid->ZN_flat), size * sizeof(FPfield));
 	cudaMemcpy(cpu_grid->XN_flat, XN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(cpu_grid->YN_flat, YN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
 	cudaMemcpy(cpu_grid->ZN_flat, ZN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-
 	cudaMemcpy(*gpu_grid, cpu_grid, sizeof(grid), cudaMemcpyHostToDevice);
-
-	// Restore pointers
 	cpu_grid->XN_flat = XN_flat;
 	cpu_grid->YN_flat = YN_flat;
 	cpu_grid->ZN_flat = ZN_flat;

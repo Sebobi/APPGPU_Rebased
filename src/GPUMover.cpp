@@ -85,25 +85,27 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 void mallocParticles(particles *part,particles *gpu_particle, particles *particle_pointers, size_t size) {
 
+
 	cudaMalloc(&gpu_particle, size * sizeof(particles));
 
 
-	long npmax;
-	for (size_t i = 0; i < size; i++) {
+	//Move each particle over
+	for (int i = 0; i < size; i++) {
+		int npmax = part[i].npmax;
+		//start by copying info about particle over
+		cudaMemcpy(gpu_particle[i], part[i], sizeof(particle), cudaMemcpyHostToDevice);
 
-		npmax = part[i].npmax;
 
-		cudaMalloc(&(gpu_particle[i].x), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].y), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].z), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].u), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].v), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].w), npmax * sizeof(FPfield));
-		cudaMalloc(&(gpu_particle[i].q), npmax * sizeof(FPfield));
+
+
+		//FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
+		/** q must have precision of interpolated quantities: typically double. Not used in mover */
+		//FPinterp* q;
+
+
+
 
 	}
-
-	cudaMemcpy(gpu_particle, part, size * sizeof(particles), cudaMemcpyHostToDevice);
 
 
 }

@@ -245,10 +245,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
 
-    std::cout << "***  MOVER with SUBCYCLYING "<< param->n_sub_cycles << " - species " << part->species_ID << " ***" << std::endl;
-
-
-
+  
 	//move particles over
 
 	particles *gpu_parts;
@@ -256,8 +253,8 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
 
 	//Move over stuff
-	//cudaMalloc(&gpu_parts, size*sizeof(particles));
-	//cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
+	cudaMalloc(&gpu_parts, size*sizeof(particles));
+	cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
 	
 	/*
 	cudaMalloc(&gpu_emf, sizeof(EMfield));

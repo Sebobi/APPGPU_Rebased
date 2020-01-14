@@ -290,10 +290,13 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	//execute kernel
 	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(gpu_parts, field, grd, param);
 	
-
-
+	cudaDeviceSynchronize();
 
 	//move particles back
+
+
+
+	cudaMemcpy(part->w, w, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
 
 
 

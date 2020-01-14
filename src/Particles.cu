@@ -295,11 +295,12 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	//move particles back
 
 
-
+	cudaMemcpy(part->x, x, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
+	cudaMemcpy(part->y, y, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
+	cudaMemcpy(part->z, z, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
+	cudaMemcpy(part->u, u, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
+	cudaMemcpy(part->v, v, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
 	cudaMemcpy(part->w, w, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
-
-
-
 
 
                                                     

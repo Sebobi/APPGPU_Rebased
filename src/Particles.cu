@@ -459,7 +459,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 
 	*/
 
-	/
+	
 	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(gpu_parts, field, grd, param);
 	
 	cudaDeviceSynchronize();

@@ -399,7 +399,7 @@ zptilde = part->z[i];
 /** particle mover */
 int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param, int size)
 {
-	int threadsPerBlock = 16*16;
+	int threadsPerBlock = 16*40;
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
 
@@ -442,10 +442,11 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	cudaMalloc(&w, size * sizeof(FPpart));
 	cudaMemcpy(w, part->w, size * sizeof(FPpart), cudaMemcpyHostToDevice);
 	cudaMemcpy(&(gpu_parts->w), &w, sizeof(FPpart), cudaMemcpyHostToDevice);
+	
 
 
-
-	//execute kernel
+	//execute kerne
+	/*
     for (int i_sub=0; i_sub <  part->n_sub_cycles; i_sub++){
 
         // Call GPU kernel
@@ -456,13 +457,13 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 
     } // end of one particle
 
+	*/
 
-
-	/*	
+	/
 	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(gpu_parts, field, grd, param);
 	
 	cudaDeviceSynchronize();
-	*/
+	
 	//move particles back
 
 

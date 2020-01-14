@@ -77,6 +77,8 @@ void particle_deallocate(struct particles* part)
 __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param){
 
 
+
+	
 	int i = blockIdx.x*blockDim.x + threadIdx.x;
 
 	if(i >= part->nop){
@@ -231,7 +233,7 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
                                  
     } // end of one particle
 
-
+	
 }
 
 
@@ -239,17 +241,72 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 /** particle mover */
 int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param, int size)
 {
-	//move particles over
-		
-	particles *gpu_parts;
-
-
-	
 	int threadsPerBlock = 16*16;
-
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
-	//MOVER_KERNEL<<<blocks,threadsPerBlock>>>(part, field, grd, param);
+
+    std::cout << "***  MOVER with SUBCYCLYING "<< param->n_sub_cycles << " - species " << part->species_ID << " ***" << std::endl;
+
+
+
+	//move particles over
+
+	particles *gpu_parts;
+
+    FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
+
+	//Move over stuff
+	cudaMalloc(&gpu_parts, size*sizeof(particles));
+	cudaMemcpy(gpu_parts, parts, size*sizeof(particles), cudaMemcpyHostToDevice);
+	
+	/*
+	cudaMalloc(&gpu_emf, sizeof(EMfield));
+	cudaMemcpy(gpu_emf, emf, size*sizeof(EMfield), cudaMemcpyHostToDevice);
+
+
+
+	//Ex
+	//malloc space for pointer(array)
+	cudaMalloc(&Ex_flat, size * sizeof(FPfield));
+	//fill array with values
+	cudaMemcpy(Ex_flat, emf->Ex_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	//make our gpu_emf->ex_flat point to the address of ex_flat we just created.
+	cudaMemcpy(&(gpu_emf->Ex_flat), &Ex_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//ey
+	cudaMalloc(&Ey_flat, size * sizeof(FPfield));
+	cudaMemcpy(Ey_flat, emf->Ey_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Ey_flat), &Ey_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//ez
+	cudaMalloc(&Ez_flat, size * sizeof(FPfield));
+	cudaMemcpy(Ez_flat, emf->Ez_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Ez_flat), &Ez_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//bx
+	cudaMalloc(&Bxn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Bxn_flat, emf->Bxn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Bxn_flat), &Bxn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//by
+	cudaMalloc(&Byn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Byn_flat, emf->Byn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Byn_flat), &Byn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	//bz
+	cudaMalloc(&Bzn_flat, size * sizeof(FPfield));
+	cudaMemcpy(Bzn_flat, emf->Bzn_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_emf->Bzn_flat), &Bzn_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+
+
+
+
+
+
+	//execute kernel
+	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(part, field, grd, param);
+	*/
+
+
+
+	//move particles back
+
 
 
 

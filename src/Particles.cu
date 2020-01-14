@@ -242,7 +242,10 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 	
 }
 
-__global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
+__global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, 
+										int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, 
+										double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat,
+										 bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
 {
     
     int i = blockIdx.x*blockDim.x + threadIdx.x;
@@ -426,7 +429,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 
 
     FPpart *x, *y, *z, *u, *v, *w;
-    FPfield *XN_flat_dev, *YN_flat_dev, *ZN_flat_dev, *Ex_flat_dev, *Ey_flat_dev, *Ez_flat_dev, *Bxn_flat_dev, *Byn_flat_dev, *Bzn_flat_dev;
+    FPfield *XN_Flat, *YN_Flat, *ZN_Flat, *Ex_flat, *Ey_Flat, *Ez_Flat, *Bxn_flat, *Byn_Flat, *Bzn_Flat;
 
 	//copy all necessary info to gpu
     cudaMalloc(&x, part->npmax * sizeof(FPpart));
@@ -441,30 +444,30 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     cudaMemcpy(v, part->v, part->npmax * sizeof(FPpart), cudaMemcpyHostToDevice); 
     cudaMalloc(&w, part->npmax * sizeof(FPpart));
     cudaMemcpy(w, part->w, part->npmax * sizeof(FPpart), cudaMemcpyHostToDevice);
-    cudaMalloc(&XN_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(XN_flat_dev, grd->XN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&YN_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(YN_flat_dev, grd->YN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&ZN_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(ZN_flat_dev, grd->ZN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Ex_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(Ex_flat_dev, field->Ex_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Ey_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(Ey_flat_dev, field->Ey_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Ez_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(Ez_flat_dev, field->Ez_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Bxn_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(Bxn_flat_dev, field->Bxn_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Byn_flat_dev, gridSize * sizeof(FPfield));
-    cudaMemcpy(Byn_flat_dev, field->Byn_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
-    cudaMalloc(&Bzn_flat_dev,gridSize * sizeof(FPfield));
-    cudaMemcpy(Bzn_flat_dev, field->Bzn_flat,gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&XN_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(XN_Flat, grd->XN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&YN_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(YN_Flat, grd->YN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&ZN_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(ZN_Flat, grd->ZN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Ex_flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(Ex_flat, field->Ex_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Ey_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(Ey_Flat, field->Ey_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Ez_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(Ez_Flat, field->Ez_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Bxn_flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(Bxn_flat, field->Bxn_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Byn_Flat, gridSize * sizeof(FPfield));
+    cudaMemcpy(Byn_Flat, field->Byn_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
+    cudaMalloc(&Bzn_Flat,gridSize * sizeof(FPfield));
+    cudaMemcpy(Bzn_Flat, field->Bzn_flat,gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
 
 	int threadPerBlock = 64;
 	int blocks = (part->npmax + threadPerBlock - 1) / threadPerBlock;
     for (int i_sub=0; i_sub <  part->n_sub_cycles; i_sub++){
 
-        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x, y, z,u, v, w, XN_flat_dev, YN_flat_dev, ZN_flat_dev, grd->nyn, grd->nzn, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, Ex_flat_dev, Ey_flat_dev, Ez_flat_dev, Bxn_flat_dev, Byn_flat_dev, Bzn_flat_dev, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
+        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x, y, z,u, v, w, XN_Flat, YN_Flat, ZN_Flat, grd->nyn, grd->nzn, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, Ex_flat, Ey_Flat, Ez_Flat, Bxn_flat, Byn_Flat, Bzn_Flat, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
 
         cudaDeviceSynchronize();
 
@@ -476,27 +479,27 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     cudaMemcpy(part->u, u, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
     cudaMemcpy(part->v, v, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
     cudaMemcpy(part->w, w, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
-	cudaMemcpy(field->Ex_flat, Ex_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Ey_flat, Ey_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Ez_flat, Ez_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Bxn_flat, Bxn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Byn_flat, Byn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Bzn_flat, Bzn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+	cudaMemcpy(field->Ex_flat, Ex_flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Ey_flat, Ey_Flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Ez_flat, Ez_Flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Bxn_flat, Bxn_flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Byn_flat, Byn_Flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Bzn_flat, Bzn_Flat, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
     cudaFree(x);
     cudaFree(y);
     cudaFree(z);
     cudaFree(u);
     cudaFree(v);
     cudaFree(w);
-    cudaFree(XN_flat_dev);
-    cudaFree(YN_flat_dev);
-    cudaFree(ZN_flat_dev);
-    cudaFree(Ex_flat_dev);
-    cudaFree(Ey_flat_dev);
-    cudaFree(Ez_flat_dev);
-    cudaFree(Bxn_flat_dev);
-    cudaFree(Byn_flat_dev);
-    cudaFree(Bzn_flat_dev);
+    cudaFree(XN_Flat);
+    cudaFree(YN_Flat);
+    cudaFree(ZN_Flat);
+    cudaFree(Ex_flat);
+    cudaFree(Ey_Flat);
+    cudaFree(Ez_Flat);
+    cudaFree(Bxn_flat);
+    cudaFree(Byn_Flat);
+    cudaFree(Bzn_Flat);
 
     return(0);
 }

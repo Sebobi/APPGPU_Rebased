@@ -262,25 +262,25 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	if (code != cudaSuccess) {
 		std::cout << "CUDA FAILED MALLOC1" << std::endl;
 	}
-	code = cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
+	code = cudaMemcpy(gpu_parts, part, sizeof(particles), cudaMemcpyHostToDevice);
 	if (code != cudaSuccess) {
-		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+		std::cout << "CUDA FAILED MALLOC2" << std::endl;
 	}
 
 	//Copy x,y,z,u,v,w arrays
 	//malloc space for pointer(array)
 	code = cudaMalloc(&x, size * sizeof(FPpart));
 	if (code != cudaSuccess) {
-		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+		std::cout << "CUDA FAILED MALLOC3" << std::endl;
 	}
 	//fill array with values
 	code = cudaMemcpy(x, part->x, size * sizeof(FPpart), cudaMemcpyHostToDevice);
 	if (code != cudaSuccess) {
-		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+		std::cout << "CUDA FAILED MALLOC4" << std::endl;
 	}
 	code = cudaMemcpy(&(gpu_parts->x), &x, sizeof(FPpart), cudaMemcpyHostToDevice);
 	if (code != cudaSuccess) {
-		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+		std::cout << "CUDA FAILED MALLOC5" << std::endl;
 	}
 
 	cudaMalloc(&y, size * sizeof(FPpart));
@@ -321,6 +321,13 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	cudaMemcpy(part->v, v, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
 	cudaMemcpy(part->w, w, size*sizeof(FPpart), cudaMemcpyDeviceToHost);
 
+	cudaFree(x);
+    cudaFree(y);
+    cudaFree(z);
+    cudaFree(u);
+    cudaFree(v);
+    cudaFree(w);
+	cudaFree(gpu_parts);
 
 
 

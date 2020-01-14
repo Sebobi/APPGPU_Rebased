@@ -239,13 +239,17 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 /** particle mover */
 int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param, int size)
 {
+	//move particles over
+		
+	particles *gpu_parts;
+
 
 	
 	int threadsPerBlock = 16*16;
 
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
-	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(part, field, grd, param);
+	//MOVER_KERNEL<<<blocks,threadsPerBlock>>>(part, field, grd, param);
 
 
 

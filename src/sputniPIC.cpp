@@ -109,8 +109,10 @@ int main(int argc, char **argv){
         // implicit mover
         iMover = cpuSecond(); // start timer for mover
 		for (int is = 0; is < param.ns; is++) {
-			mover_PC_GPU(&part[is], GPU_emf, GPU_grid, GPU_param, part[is].nop);
 
+			int species = is + 1;
+			std::cout << "***  MOVER with SUBCYCLYING " << param->n_sub_cycles << " - species " << species << " ***" << std::endl;
+			mover_PC_GPU(&part[is], GPU_emf, GPU_grid, GPU_param, part[is].nop);
 			//mover_PC(&part[is],&field,&grd,&param);
 		}
 

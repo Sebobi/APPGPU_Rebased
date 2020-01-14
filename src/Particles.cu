@@ -245,7 +245,9 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
 
-  
+
+
+
 	//move particles over
 
 	particles *gpu_parts;

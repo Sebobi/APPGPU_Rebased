@@ -104,13 +104,15 @@ int main(int argc, char **argv){
         // set to zero the densities - needed for interpolation
         setZeroDensities(&idn,ids,&grd,param.ns);
         
-        
+	bool GPU_enabled = true;        
         
         // implicit mover
         iMover = cpuSecond(); // start timer for mover
 		for (int is = 0; is < param.ns; is++) {
-			mover_PC_GPU(&part[is], &field, &grd, &param, part[is].nop);
-			//mover_PC(&part[is],&field,&grd,&param);
+			if(GPU_enabled)
+			    mover_PC_GPU(&part[is], &field, &grd, &param, part[is].nop);
+			else
+			    mover_PC(&part[is],&field,&grd,&param);
 		}
 
 

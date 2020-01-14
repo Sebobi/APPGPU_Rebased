@@ -79,29 +79,16 @@ int main(int argc, char **argv){
 
 
 	//initialize and load to GPU here
-
 	size_t gridSize = (grd.nxn*grd.nyn*grd.nzn);
-	int numSpecies = param.ns;
 
 	grid *GPU_grid;
 	parameters *GPU_param;
 	EMfield *GPU_emf;
 
-	particles *GPU_particles;
-	particles *particle_pointers;
-
-
 
 	copyGrid(&grd, &GPU_grid, gridSize);
 	copyParam(&param, GPU_param);
 	copyEMfield(&field, GPU_emf, gridSize);
-
-	mallocParticles(part, &GPU_particles, particle_pointers, numSpecies);
-
-
-
-
-
 
     
     // **********************************************************//

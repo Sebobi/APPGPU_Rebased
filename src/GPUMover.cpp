@@ -14,7 +14,7 @@ void copyGrid(grid *cpu_grid, grid *gpu_grid, size_t size){
 	FPfield *YN_flat;
 	FPfield *ZN_flat;
 
-	code = cudaMalloc(&gpu_grid, size*sizeof(grid));
+	code = cudaMalloc((void**)&gpu_grid, size*sizeof(grid));
 	if (code != cudaSuccess) {
 		std::cout << "CUDA FAILED MALLOC1" << std::endl;
 	}

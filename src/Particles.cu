@@ -242,15 +242,14 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 	
 }
 
-
-/** particle kernel */
-
-__global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPinterp* q, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, int nxn, int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
+__global__ void single_particle_kernel(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPinterp* q, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, int nxn, int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
 {
     
-    int i = blockIdx.x*blockDim.x + threadIdx.x;
+    int idx = blockIdx.x*blockDim.x + threadIdx.x;
 
-    if(i > npmax)
+    int flat_idx = 0;
+    
+    if(idx > npmax)
     {
         return;
     }
@@ -268,27 +267,33 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     // intermediate particle position and velocity
     FPpart xptilde, yptilde, zptilde, uptilde, vptilde, wptilde;
 
-    xptilde = x[i];
-    yptilde = y[i];
-    zptilde = z[i];
+    xptilde = x[idx];
+    yptilde = y[idx];
+    zptilde = z[idx];
 
     // calculate the average velocity iteratively
     for(int innter=0; innter < NiterMover; innter++){
         
         // interpolation G-->P
-        ix = 2 +  int((x[i] - xStart)*invdx);
-        iy = 2 +  int((y[i] - yStart)*invdy);
-        iz = 2 +  int((z[i] - zStart)*invdz);
+        ix = 2 +  int((x[idx] - xStart)*invdx);
+        iy = 2 +  int((y[idx] - yStart)*invdy);
+        iz = 2 +  int((z[idx] - zStart)*invdz);
 
         // calculate weights
 
-        int id = get_idx(ix-1, iy, iz, nyn, nzn);
-        xi[0]   = x[i] - XN_flat[id];
-        eta[0]  = y[i] - YN_flat[id];
-        zeta[0] = z[i] - ZN_flat[id];
-        xi[1]   = XN_flat[id] - x[i];
-        eta[1]  = YN_flat[id] - y[i];
-        zeta[1] = ZN_flat[id] - z[i];
+        flat_idx = get_idx(ix-1, iy, iz, nyn, nzn);
+        xi[0]   = x[idx] - XN_flat[flat_idx];
+
+        flat_idx = get_idx(ix, iy-1, iz, nyn, nzn);
+        eta[0]  = y[idx] - YN_flat[flat_idx];
+
+        flat_idx = get_idx(ix, iy, iz-1, nyn, nzn);
+        zeta[0] = z[idx] - ZN_flat[flat_idx];
+
+        flat_idx = get_idx(ix, iy, iz, nyn, nzn);
+        xi[1]   = XN_flat[flat_idx] - x[idx];
+        eta[1]  = YN_flat[flat_idx] - y[idx];
+        zeta[1] = ZN_flat[flat_idx] - z[idx];
 
         for (int ii = 0; ii < 2; ii++)
             for (int jj = 0; jj < 2; jj++)
@@ -302,13 +307,13 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
             for (int jj=0; jj < 2; jj++)
                 for(int kk=0; kk < 2; kk++){
 
-                    int id = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
-                    Exl += weight[ii][jj][kk]*Ex_flat[id];
-                    Eyl += weight[ii][jj][kk]*Ey_flat[id];
-                    Ezl += weight[ii][jj][kk]*Ez_flat[id];
-                    Bxl += weight[ii][jj][kk]*Bxn_flat[id];
-                    Byl += weight[ii][jj][kk]*Byn_flat[id];
-                    Bzl += weight[ii][jj][kk]*Bzn_flat[id];
+                    flat_idx = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
+                    Exl += weight[ii][jj][kk]*Ex_flat[flat_idx];
+                    Eyl += weight[ii][jj][kk]*Ey_flat[flat_idx];
+                    Ezl += weight[ii][jj][kk]*Ez_flat[flat_idx];
+                    Bxl += weight[ii][jj][kk]*Bxn_flat[flat_idx];
+                    Byl += weight[ii][jj][kk]*Byn_flat[flat_idx];
+                    Bzl += weight[ii][jj][kk]*Bzn_flat[flat_idx];
             
         } // end interpolation
         
@@ -316,9 +321,9 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
         denom = 1.0/(1.0 + omdtsq);
 
         // solve the position equation
-        ut= u[i] + qomdt2*Exl;
-        vt= v[i] + qomdt2*Eyl;
-        wt= w[i] + qomdt2*Ezl;
+        ut= u[idx] + qomdt2*Exl;
+        vt= v[idx] + qomdt2*Eyl;
+        wt= w[idx] + qomdt2*Ezl;
         udotb = ut*Bxl + vt*Byl + wt*Bzl;
 
         // solve the velocity equation
@@ -327,20 +332,20 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
         wptilde = (wt+qomdt2*(ut*Byl -vt*Bxl + qomdt2*udotb*Bzl))*denom;
 
         // update position
-        x[i] = xptilde + uptilde*dto2;
-        y[i] = yptilde + vptilde*dto2;
-        z[i] = zptilde + wptilde*dto2;
+        x[idx] = xptilde + uptilde*dto2;
+        y[idx] = yptilde + vptilde*dto2;
+        z[idx] = zptilde + wptilde*dto2;
 
 
     } // end of iteration
     
     // update the final position and velocity
-    u[i]= 2.0*uptilde - u[i];
-    v[i]= 2.0*vptilde - v[i];
-    w[i]= 2.0*wptilde - w[i];
-    x[i] = xptilde + uptilde*dt_sub_cycling;
-    y[i] = yptilde + vptilde*dt_sub_cycling;
-    z[i] = zptilde + wptilde*dt_sub_cycling;
+    u[idx]= 2.0*uptilde - u[idx];
+    v[idx]= 2.0*vptilde - v[idx];
+    w[idx]= 2.0*wptilde - w[idx];
+    x[idx] = xptilde + uptilde*dt_sub_cycling;
+    y[idx] = yptilde + vptilde*dt_sub_cycling;
+    z[idx] = zptilde + wptilde*dt_sub_cycling;
 
 
     //////////
@@ -348,60 +353,60 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     ////////// BC
 
     // X-DIRECTION: BC particles
-    if (x[i] > Lx){
+    if (x[idx] > Lx){
         if (PERIODICX==true){ // PERIODIC
-            x[i] = x[i] - Lx;
+            x[idx] = x[idx] - Lx;
         } else { // REFLECTING BC
-            u[i] = -u[i];
-            x[i] = 2*Lx - x[i];
+            u[idx] = -u[idx];
+            x[idx] = 2*Lx - x[idx];
         }
     }
 
-    if (x[i] < 0){
+    if (x[idx] < 0){
         if (PERIODICX==true){ // PERIODIC
-            x[i] = x[i] + Lx;
+            x[idx] = x[idx] + Lx;
         } else { // REFLECTING BC
-            u[i] = -u[i];
-            x[i] = -x[i];
+            u[idx] = -u[idx];
+            x[idx] = -x[idx];
         }
     }
 
 
     // Y-DIRECTION: BC particles
-    if (y[i] > Ly){
+    if (y[idx] > Ly){
         if (PERIODICY==true){ // PERIODIC
-            y[i] = y[i] - Ly;
+            y[idx] = y[idx] - Ly;
         } else { // REFLECTING BC
-            v[i] = -v[i];
-            y[i] = 2*Ly - y[i];
+            v[idx] = -v[idx];
+            y[idx] = 2*Ly - y[idx];
         }
     }
 
-    if (y[i] < 0){
+    if (y[idx] < 0){
         if (PERIODICY==true){ // PERIODIC
-            y[i] = y[i] + Ly;
+            y[idx] = y[idx] + Ly;
         } else { // REFLECTING BC
-            v[i] = -v[i];
-            y[i] = -y[i];
+            v[idx] = -v[idx];
+            y[idx] = -y[idx];
         }
     }
 
     // Z-DIRECTION: BC particles
-    if (z[i] > Lz){
+    if (z[idx] > Lz){
         if (PERIODICZ==true){ // PERIODIC
-            z[i] = z[i] - Lz;
+            z[idx] = z[idx] - Lz;
         } else { // REFLECTING BC
-            w[i] = -w[i];
-            z[i] = 2*Lz - z[i];
+            w[idx] = -w[idx];
+            z[idx] = 2*Lz - z[idx];
         }
     }
 
-    if (z[i] < 0){
+    if (z[idx] < 0){
         if (PERIODICZ==true){ // PERIODIC
-            z[i] = z[i] + Lz;
+            z[idx] = z[idx] + Lz;
         } else { // REFLECTING BC
-            w[i] = -w[i];
-            z[i] = -z[i];
+            w[idx] = -w[idx];
+            z[idx] = -z[idx];
         }
     }
 }
@@ -488,12 +493,12 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     cudaMemcpy(part->u, u_dev, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
     cudaMemcpy(part->v, v_dev, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
     cudaMemcpy(part->w, w_dev, part->npmax * sizeof(FPpart), cudaMemcpyDeviceToHost);
-	cudaMemcpy(field->Ex_flat, Ex_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Ey_flat, Ey_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Ez_flat, Ez_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Bxn_flat, Bxn_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Byn_flat, Byn_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
-    cudaMemcpy(field->Bzn_flat, Bzn_flat_dev, grd->nxn * grd->nyn * grd->nzn * sizeof(FPfield), cudaMemcpyDeviceToHost);
+	cudaMemcpy(field->Ex_flat, Ex_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Ey_flat, Ey_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Ez_flat, Ez_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Bxn_flat, Bxn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Byn_flat, Byn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
+    cudaMemcpy(field->Bzn_flat, Bzn_flat_dev, gridSize * sizeof(FPfield), cudaMemcpyDeviceToHost);
     cudaFree(x_dev);
     cudaFree(y_dev);
     cudaFree(z_dev);

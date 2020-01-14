@@ -258,20 +258,37 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	cudaMalloc(&gpu_parts, sizeof(particles));
 	cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
 
-	//Ex
+	//Copy x,y,z,u,v,w arrays
 	//malloc space for pointer(array)
 	cudaMalloc(&x, size * sizeof(FPpart));
 	//fill array with values
 	cudaMemcpy(x, part->x, size * sizeof(FPpart), cudaMemcpyHostToDevice);
-	//make our gpu_emf->ex_flat point to the address of ex_flat we just created.
 	cudaMemcpy(&(gpu_parts->x), &x, sizeof(FPpart), cudaMemcpyHostToDevice);
 
+	cudaMalloc(&y, size * sizeof(FPpart));
+	cudaMemcpy(y, part->y, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_parts->y), &y, sizeof(FPpart), cudaMemcpyHostToDevice);
 
+	cudaMalloc(&z, size * sizeof(FPpart));
+	cudaMemcpy(z, part->z, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_parts->z), &z, sizeof(FPpart), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&u, size * sizeof(FPpart));
+	cudaMemcpy(u, part->u, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_parts->u), &u, sizeof(FPpart), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&v, size * sizeof(FPpart));
+	cudaMemcpy(v, part->v, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_parts->v), &v, sizeof(FPpart), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&w, size * sizeof(FPpart));
+	cudaMemcpy(w, part->w, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_parts->w), &w, sizeof(FPpart), cudaMemcpyHostToDevice);
 
 
 
 	//execute kernel
-	//MOVER_KERNEL<<<blocks,threadsPerBlock>>>(part, field, grd, param);
+	MOVER_KERNEL<<<blocks,threadsPerBlock>>>(gpu_parts, field, grd, param);
 	
 
 

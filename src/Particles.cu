@@ -257,7 +257,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 
 	//Move over stuff
 	cudaMalloc(&gpu_parts, size*sizeof(particles));
-	cudaMemcpy(gpu_parts, parts, size*sizeof(particles), cudaMemcpyHostToDevice);
+	cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
 	
 	/*
 	cudaMalloc(&gpu_emf, sizeof(EMfield));

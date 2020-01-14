@@ -81,7 +81,7 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 	
 	int i = blockIdx.x*blockDim.x + threadIdx.x;
 
-	printf("blockIdx.x:%d * blockDim.x:%d + threadIdx.x:%d = globalThreadId:%d\n", blockIdx.x, blockDim.x, threadIdx.x, globalThreadId);
+	printf("blockIdx.x:%d * blockDim.x:%d + threadIdx.x:%d = \n", blockIdx.x, blockDim.x, threadIdx.x);
 
 
 	if(i >= part->nop){

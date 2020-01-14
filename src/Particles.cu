@@ -250,8 +250,6 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     
     int i = blockIdx.x*blockDim.x + threadIdx.x;
 
-    int flat_idx = 0;
-    
     if(i > npmax)
     {
         return;
@@ -284,13 +282,13 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
 
         // calculate weights
 
-        flat_idx = get_idx(ix-1, iy, iz, nyn, nzn);
-        xi[0]   = x[idx] - XN_flat[flat_idx];
-        eta[0]  = y[idx] - YN_flat[flat_idx];
-        zeta[0] = z[idx] - ZN_flat[flat_idx];
-        xi[1]   = XN_flat[flat_idx] - x[i];
-        eta[1]  = YN_flat[flat_idx] - y[i];
-        zeta[1] = ZN_flat[flat_idx] - z[i];
+        int id = get_idx(ix-1, iy, iz, nyn, nzn);
+        xi[0]   = x[i] - XN_flat[id];
+        eta[0]  = y[i] - YN_flat[id];
+        zeta[0] = z[i] - ZN_flat[id];
+        xi[1]   = XN_flat[id] - x[i];
+        eta[1]  = YN_flat[id] - y[i];
+        zeta[1] = ZN_flat[id] - z[i];
 
         for (int ii = 0; ii < 2; ii++)
             for (int jj = 0; jj < 2; jj++)

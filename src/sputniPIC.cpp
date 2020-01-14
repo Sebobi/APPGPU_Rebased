@@ -76,7 +76,7 @@ int main(int argc, char **argv){
     // Initialization
     initGEM(&param,&grd,&field,&field_aux,part,ids);
 
-
+	//||||||||||||||||GPU|||||||||||||||
 
 	//initialize and load to GPU here
 	size_t gridSize = (grd.nxn*grd.nyn*grd.nzn);
@@ -109,7 +109,7 @@ int main(int argc, char **argv){
         // implicit mover
         iMover = cpuSecond(); // start timer for mover
 		for (int is = 0; is < param.ns; is++)
-			mover_PC_GPU(&part[is], &field, &grd, &param);
+			mover_PC_GPU(&part[is], field, grd, param,part[is].nop);
             //mover_PC(&part[is],&field,&grd,&param);
         eMover += (cpuSecond() - iMover); // stop timer for mover
         

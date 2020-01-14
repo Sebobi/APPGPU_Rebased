@@ -264,7 +264,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
 
 	//Move over stuff
-	code = cudaMalloc(&gpu_parts, sizeof(particles));
+	code = cudaMalloc((void**)&gpu_parts, sizeof(particles));
 	if (code != cudaSuccess) {
 		std::cout << "CUDA FAILED MALLOC1" << std::endl;
 	}

@@ -4,23 +4,32 @@
 #include "Particles.h"
 
 
-void copyGrid(grid *cpu_grid, grid **gpu_grid, size_t size){
+void copyGrid(grid *cpu_grid, grid *gpu_grid, size_t size){
 
-	//Copy over the grid to GPU
-	cudaMalloc(gpu_grid, sizeof(grid));
-	FPfield *XN_flat = cpu_grid->XN_flat;
-	FPfield *YN_flat = cpu_grid->YN_flat;
-	FPfield *ZN_flat = cpu_grid->ZN_flat;
-	cudaMalloc(&(cpu_grid->XN_flat), size * sizeof(FPfield));
-	cudaMalloc(&(cpu_grid->YN_flat), size * sizeof(FPfield));
-	cudaMalloc(&(cpu_grid->ZN_flat), size * sizeof(FPfield));
-	cudaMemcpy(cpu_grid->XN_flat, XN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(cpu_grid->YN_flat, YN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(cpu_grid->ZN_flat, ZN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(*gpu_grid, cpu_grid, sizeof(grid), cudaMemcpyHostToDevice);
-	cpu_grid->XN_flat = XN_flat;
-	cpu_grid->YN_flat = YN_flat;
-	cpu_grid->ZN_flat = ZN_flat;
+
+	FPfield *XN_flat;
+	FPfield *YN_flat;
+	FPfield *ZN_flat;
+
+	cudaMalloc(&gpu_grid, sizeof(grid));
+	cudaMemcpy(gpu_grid, cpu_grid, size * sizeof(grid), cudaMemcpyHostToDevice);
+
+
+	cudaMalloc(&XN_flat, size * sizeof(FPfield));
+	cudaMemcpy(XN_flat, cpu_grid->XN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_grid->XN_flat), &XN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&YN_flat, size * sizeof(FPfield));
+	cudaMemcpy(YN_flat, cpu_grid->YN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_grid->YN_flat), &YN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+	cudaMalloc(&ZN_flat, size * sizeof(FPfield));
+	cudaMemcpy(ZN_flat, cpu_grid->ZN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	cudaMemcpy(&(gpu_grid->ZN_flat), &ZN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+
+
+
+
 
 }
 

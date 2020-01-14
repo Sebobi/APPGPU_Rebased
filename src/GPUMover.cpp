@@ -6,26 +6,37 @@
 
 void copyGrid(grid *cpu_grid, grid *gpu_grid, size_t size){
 
+	cudaError_t code;
+
+
 
 	FPfield *XN_flat;
 	FPfield *YN_flat;
 	FPfield *ZN_flat;
 
-	cudaMalloc(&gpu_grid, sizeof(grid));
-	cudaMemcpy(gpu_grid, cpu_grid, size * sizeof(grid), cudaMemcpyHostToDevice);
+	code = cudaMalloc(&gpu_grid, sizeof(grid));
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC" << std::endl;
+	}
+	code = cudaMemcpy(gpu_grid, cpu_grid, size * sizeof(grid), cudaMemcpyHostToDevice);
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC" << std::endl;
+	}
 
+	code = cudaMalloc(&XN_flat, size * sizeof(FPfield));
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC" << std::endl;
+	}
+	code = cudaMemcpy(XN_flat, cpu_grid->XN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	code = cudaMemcpy(&(gpu_grid->XN_flat), &XN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
 
-	cudaMalloc(&XN_flat, size * sizeof(FPfield));
-	cudaMemcpy(XN_flat, cpu_grid->XN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_grid->XN_flat), &XN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	code = cudaMalloc(&YN_flat, size * sizeof(FPfield));
+	code = cudaMemcpy(YN_flat, cpu_grid->YN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	code = cudaMemcpy(&(gpu_grid->YN_flat), &YN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
 
-	cudaMalloc(&YN_flat, size * sizeof(FPfield));
-	cudaMemcpy(YN_flat, cpu_grid->YN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_grid->YN_flat), &YN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
-
-	cudaMalloc(&ZN_flat, size * sizeof(FPfield));
-	cudaMemcpy(ZN_flat, cpu_grid->ZN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_grid->ZN_flat), &ZN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
+	code = cudaMalloc(&ZN_flat, size * sizeof(FPfield));
+	code = cudaMemcpy(ZN_flat, cpu_grid->ZN_flat, size * sizeof(FPfield), cudaMemcpyHostToDevice);
+	code = cudaMemcpy(&(gpu_grid->ZN_flat), &ZN_flat, sizeof(FPfield), cudaMemcpyHostToDevice);
 
 
 

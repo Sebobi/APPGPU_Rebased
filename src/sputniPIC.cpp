@@ -109,8 +109,6 @@ int main(int argc, char **argv){
         // implicit mover
         iMover = cpuSecond(); // start timer for mover
 		for (int is = 0; is < param.ns; is++) {
-			double lx = grd.Lx;
-			std::cout << "   grid.Lx = " << lx << std::endl;
 			mover_PC_GPU(&part[is], GPU_emf, GPU_grid, GPU_param, part[is].nop);
 		}
 

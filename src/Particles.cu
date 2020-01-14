@@ -85,6 +85,9 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 		return;
 	}
 
+	printf(grd->XN_flat[2]);
+	
+
     // auxiliary variables
     FPpart dt_sub_cycling = (FPpart) param->dt/((double) part->n_sub_cycles);
     FPpart dto2 = .5*dt_sub_cycling, qomdt2 = part->qom*dto2/param->c;

@@ -310,7 +310,7 @@ __global__ void single_particle_kernel(FPpart* x, FPpart* y, FPpart* z, FPpart* 
             for (int jj=0; jj < 2; jj++)
                 for(int kk=0; kk < 2; kk++){
 
-                    id = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
+                    int id = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
                     Exl += weight[ii][jj][kk]*Ex_flat[id];
                     Eyl += weight[ii][jj][kk]*Ey_flat[id];
                     Ezl += weight[ii][jj][kk]*Ez_flat[id];

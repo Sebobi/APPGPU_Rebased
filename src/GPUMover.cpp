@@ -81,7 +81,3 @@ void copyEMfield(EMfield *emf, EMfield *gpu_emf, size_t size) {
 
 	
 	}
-
-
-}
-

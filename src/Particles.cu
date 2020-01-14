@@ -245,11 +245,11 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPinterp* q, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, int nxn, int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
 {
     
-    int idx = blockIdx.x*blockDim.x + threadIdx.x;
+    int i = blockIdx.x*blockDim.x + threadIdx.x;
 
     int flat_idx = 0;
     
-    if(idx > npmax)
+    if(i > npmax)
     {
         return;
     }
@@ -267,33 +267,33 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     // intermediate particle position and velocity
     FPpart xptilde, yptilde, zptilde, uptilde, vptilde, wptilde;
 
-    xptilde = x[idx];
-    yptilde = y[idx];
-    zptilde = z[idx];
+    xptilde = x[i];
+    yptilde = y[i];
+    zptilde = z[i];
 
     // calculate the average velocity iteratively
     for(int innter=0; innter < NiterMover; innter++){
         
         // interpolation G-->P
-        ix = 2 +  int((x[idx] - xStart)*invdx);
-        iy = 2 +  int((y[idx] - yStart)*invdy);
-        iz = 2 +  int((z[idx] - zStart)*invdz);
+        ix = 2 +  int((x[i] - xStart)*invdx);
+        iy = 2 +  int((y[i] - yStart)*invdy);
+        iz = 2 +  int((z[i] - zStart)*invdz);
 
         // calculate weights
 
         flat_idx = get_idx(ix-1, iy, iz, nyn, nzn);
-        xi[0]   = x[idx] - XN_flat[flat_idx];
+        xi[0]   = x[i] - XN_flat[flat_idx];
 
         flat_idx = get_idx(ix, iy-1, iz, nyn, nzn);
-        eta[0]  = y[idx] - YN_flat[flat_idx];
+        eta[0]  = y[i] - YN_flat[flat_idx];
 
         flat_idx = get_idx(ix, iy, iz-1, nyn, nzn);
-        zeta[0] = z[idx] - ZN_flat[flat_idx];
+        zeta[0] = z[i] - ZN_flat[flat_idx];
 
         flat_idx = get_idx(ix, iy, iz, nyn, nzn);
-        xi[1]   = XN_flat[flat_idx] - x[idx];
-        eta[1]  = YN_flat[flat_idx] - y[idx];
-        zeta[1] = ZN_flat[flat_idx] - z[idx];
+        xi[1]   = XN_flat[flat_idx] - x[i];
+        eta[1]  = YN_flat[flat_idx] - y[i];
+        zeta[1] = ZN_flat[flat_idx] - z[i];
 
         for (int ii = 0; ii < 2; ii++)
             for (int jj = 0; jj < 2; jj++)
@@ -321,9 +321,9 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
         denom = 1.0/(1.0 + omdtsq);
 
         // solve the position equation
-        ut= u[idx] + qomdt2*Exl;
-        vt= v[idx] + qomdt2*Eyl;
-        wt= w[idx] + qomdt2*Ezl;
+        ut= u[i] + qomdt2*Exl;
+        vt= v[i] + qomdt2*Eyl;
+        wt= w[i] + qomdt2*Ezl;
         udotb = ut*Bxl + vt*Byl + wt*Bzl;
 
         // solve the velocity equation
@@ -332,20 +332,20 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
         wptilde = (wt+qomdt2*(ut*Byl -vt*Bxl + qomdt2*udotb*Bzl))*denom;
 
         // update position
-        x[idx] = xptilde + uptilde*dto2;
-        y[idx] = yptilde + vptilde*dto2;
-        z[idx] = zptilde + wptilde*dto2;
+        x[i] = xptilde + uptilde*dto2;
+        y[i] = yptilde + vptilde*dto2;
+        z[i] = zptilde + wptilde*dto2;
 
 
     } // end of iteration
     
     // update the final position and velocity
-    u[idx]= 2.0*uptilde - u[idx];
-    v[idx]= 2.0*vptilde - v[idx];
-    w[idx]= 2.0*wptilde - w[idx];
-    x[idx] = xptilde + uptilde*dt_sub_cycling;
-    y[idx] = yptilde + vptilde*dt_sub_cycling;
-    z[idx] = zptilde + wptilde*dt_sub_cycling;
+    u[i]= 2.0*uptilde - u[i];
+    v[i]= 2.0*vptilde - v[i];
+    w[i]= 2.0*wptilde - w[i];
+    x[i] = xptilde + uptilde*dt_sub_cycling;
+    y[i] = yptilde + vptilde*dt_sub_cycling;
+    z[i] = zptilde + wptilde*dt_sub_cycling;
 
 
     //////////
@@ -353,60 +353,60 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     ////////// BC
 
     // X-DIRECTION: BC particles
-    if (x[idx] > Lx){
+    if (x[i] > Lx){
         if (PERIODICX==true){ // PERIODIC
-            x[idx] = x[idx] - Lx;
+            x[i] = x[i] - Lx;
         } else { // REFLECTING BC
-            u[idx] = -u[idx];
-            x[idx] = 2*Lx - x[idx];
+            u[i] = -u[i];
+            x[i] = 2*Lx - x[i];
         }
     }
 
-    if (x[idx] < 0){
+    if (x[i] < 0){
         if (PERIODICX==true){ // PERIODIC
-            x[idx] = x[idx] + Lx;
+            x[i] = x[i] + Lx;
         } else { // REFLECTING BC
-            u[idx] = -u[idx];
-            x[idx] = -x[idx];
+            u[i] = -u[i];
+            x[i] = -x[i];
         }
     }
 
 
     // Y-DIRECTION: BC particles
-    if (y[idx] > Ly){
+    if (y[i] > Ly){
         if (PERIODICY==true){ // PERIODIC
-            y[idx] = y[idx] - Ly;
+            y[i] = y[i] - Ly;
         } else { // REFLECTING BC
-            v[idx] = -v[idx];
-            y[idx] = 2*Ly - y[idx];
+            v[i] = -v[i];
+            y[i] = 2*Ly - y[i];
         }
     }
 
-    if (y[idx] < 0){
+    if (y[i] < 0){
         if (PERIODICY==true){ // PERIODIC
-            y[idx] = y[idx] + Ly;
+            y[i] = y[i] + Ly;
         } else { // REFLECTING BC
-            v[idx] = -v[idx];
-            y[idx] = -y[idx];
+            v[i] = -v[i];
+            y[i] = -y[i];
         }
     }
 
     // Z-DIRECTION: BC particles
-    if (z[idx] > Lz){
+    if (z[i] > Lz){
         if (PERIODICZ==true){ // PERIODIC
-            z[idx] = z[idx] - Lz;
+            z[i] = z[i] - Lz;
         } else { // REFLECTING BC
-            w[idx] = -w[idx];
-            z[idx] = 2*Lz - z[idx];
+            w[i] = -w[i];
+            z[i] = 2*Lz - z[i];
         }
     }
 
-    if (z[idx] < 0){
+    if (z[i] < 0){
         if (PERIODICZ==true){ // PERIODIC
-            z[idx] = z[idx] + Lz;
+            z[i] = z[i] + Lz;
         } else { // REFLECTING BC
-            w[idx] = -w[idx];
-            z[idx] = -z[idx];
+            w[i] = -w[i];
+            z[i] = -z[i];
         }
     }
 }

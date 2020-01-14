@@ -85,7 +85,7 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 		return;
 	}
 
-	printf(grd->XN_flat[2]);
+	printf("gridStuff:%d",grd->XN_flat[2]);
 	
 
     // auxiliary variables

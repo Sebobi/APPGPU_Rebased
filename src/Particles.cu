@@ -242,7 +242,7 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 	
 }
 
-__global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPinterp* q, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, int nxn, int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
+__global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
 {
     
     int i = blockIdx.x*blockDim.x + threadIdx.x;
@@ -426,7 +426,6 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 
 
     FPpart *x_dev, *y_dev, *z_dev, *u_dev, *v_dev, *w_dev;
-    FPinterp *q_dev;
     FPfield *XN_flat_dev = NULL, *YN_flat_dev = NULL, *ZN_flat_dev = NULL, *Ex_flat_dev = NULL, *Ey_flat_dev = NULL, *Ez_flat_dev = NULL, *Bxn_flat_dev = NULL, *Byn_flat_dev, *Bzn_flat_dev = NULL;
 
     cudaMalloc(&x_dev, part->npmax * sizeof(FPpart));
@@ -447,8 +446,6 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     cudaMalloc(&w_dev, part->npmax * sizeof(FPpart));
     cudaMemcpy(w_dev, part->w, part->npmax * sizeof(FPpart), cudaMemcpyHostToDevice);
 
-    cudaMalloc(&q_dev, part->npmax * sizeof(FPinterp));
-    cudaMemcpy(q_dev, part->q, part->npmax * sizeof(FPinterp), cudaMemcpyHostToDevice);  
 
     cudaMalloc(&XN_flat_dev, gridSize * sizeof(FPfield));
     cudaMemcpy(XN_flat_dev, grd->XN_flat, gridSize * sizeof(FPfield), cudaMemcpyHostToDevice);
@@ -481,7 +478,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	int blocks = (part->npmax + threadPerBlock - 1) / threadPerBlock;
     for (int i_sub=0; i_sub <  part->n_sub_cycles; i_sub++){
 
-        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x_dev, y_dev, z_dev,u_dev, v_dev, w_dev, q_dev, XN_flat_dev, YN_flat_dev, ZN_flat_dev, grd->nxn, grd->nyn, grd->nzn, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, Ex_flat_dev, Ey_flat_dev, Ez_flat_dev, Bxn_flat_dev, Byn_flat_dev, Bzn_flat_dev, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
+        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x_dev, y_dev, z_dev,u_dev, v_dev, w_dev, XN_flat_dev, YN_flat_dev, ZN_flat_dev, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, Ex_flat_dev, Ey_flat_dev, Ez_flat_dev, Bxn_flat_dev, Byn_flat_dev, Bzn_flat_dev, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
 
         cudaDeviceSynchronize();
 

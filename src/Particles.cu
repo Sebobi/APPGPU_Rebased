@@ -241,6 +241,9 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 /** particle mover */
 int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param, int size)
 {
+
+	cudaError_t code;
+
 	int threadsPerBlock = 16*40;
 	int blocks = (size + threadsPerBlock -1) / threadsPerBlock;
 
@@ -255,15 +258,30 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
     FPpart* x; FPpart*  y; FPpart* z; FPpart* u; FPpart* v; FPpart* w;
 
 	//Move over stuff
-	cudaMalloc(&gpu_parts, sizeof(particles));
-	cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
+	code = cudaMalloc(&gpu_parts, sizeof(particles));
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+	}
+	code = cudaMemcpy(gpu_parts, part, size*sizeof(particles), cudaMemcpyHostToDevice);
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+	}
 
 	//Copy x,y,z,u,v,w arrays
 	//malloc space for pointer(array)
-	cudaMalloc(&x, size * sizeof(FPpart));
+	code = cudaMalloc(&x, size * sizeof(FPpart));
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+	}
 	//fill array with values
-	cudaMemcpy(x, part->x, size * sizeof(FPpart), cudaMemcpyHostToDevice);
-	cudaMemcpy(&(gpu_parts->x), &x, sizeof(FPpart), cudaMemcpyHostToDevice);
+	code = cudaMemcpy(x, part->x, size * sizeof(FPpart), cudaMemcpyHostToDevice);
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+	}
+	code = cudaMemcpy(&(gpu_parts->x), &x, sizeof(FPpart), cudaMemcpyHostToDevice);
+	if (code != cudaSuccess) {
+		std::cout << "CUDA FAILED MALLOC1" << std::endl;
+	}
 
 	cudaMalloc(&y, size * sizeof(FPpart));
 	cudaMemcpy(y, part->y, size * sizeof(FPpart), cudaMemcpyHostToDevice);

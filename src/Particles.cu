@@ -243,9 +243,9 @@ __global__ void MOVER_KERNEL(struct particles* part, struct EMfield* field, stru
 }
 
 __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart* u, FPpart* v, FPpart* w, FPfield* XN_flat, FPfield* YN_flat, FPfield* ZN_flat, 
+										FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat,
 										int nyn, int nzn, double xStart, double yStart, double zStart, FPfield invdx, FPfield invdy, FPfield invdz, 
-										double Lx, double Ly, double Lz, FPfield invVOL, FPfield* Ex_flat, FPfield* Ey_flat, FPfield* Ez_flat, FPfield* Bxn_flat, FPfield* Byn_flat, FPfield* Bzn_flat,
-										 bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
+										double Lx, double Ly, double Lz, FPfield invVOL, bool PERIODICX, bool PERIODICY, bool PERIODICZ, FPpart dt_sub_cycling, FPpart dto2, FPpart qomdt2, int NiterMover, int npmax)
 {
     
     int i = blockIdx.x*blockDim.x + threadIdx.x;
@@ -414,7 +414,8 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     }
 }
 
-/** particle mover for GPU*/
+
+
 int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd, struct parameters* param,int size)
 {
 
@@ -467,7 +468,7 @@ int mover_PC_GPU(struct particles* part, struct EMfield* field, struct grid* grd
 	int blocks = (part->npmax + threadPerBlock - 1) / threadPerBlock;
     for (int i_sub=0; i_sub <  part->n_sub_cycles; i_sub++){
 
-        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x, y, z,u, v, w, XN_Flat, YN_Flat, ZN_Flat, grd->nyn, grd->nzn, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, Ex_flat, Ey_Flat, Ez_Flat, Bxn_flat, Byn_Flat, Bzn_Flat, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
+        MOVER_KERNEL_BRUTEFORCE<<<blocks,threadPerBlock>>>(x, y, z,u, v, w, XN_Flat, YN_Flat, ZN_Flat, Ex_flat, Ey_Flat, Ez_Flat, Bxn_flat, Byn_Flat, Bzn_Flat, grd->nyn, grd->nzn, grd->xStart, grd->yStart, grd->zStart, grd->invdx, grd->invdy, grd->invdz, grd->Lx, grd->Ly, grd->Lz, grd->invVOL, param->PERIODICX, param->PERIODICY, param->PERIODICZ, dt_sub_cycling, dto2, qomdt2, part->NiterMover, part->nop);
 
         cudaDeviceSynchronize();
 

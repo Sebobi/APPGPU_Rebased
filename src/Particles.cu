@@ -250,7 +250,7 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
     
     int i = blockIdx.x*blockDim.x + threadIdx.x;
 
-    int flat_idx = 0;
+
     
     if(i > npmax)
     {
@@ -284,19 +284,19 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
 
         // calculate weights
 
-        flat_idx = get_idx(ix-1, iy, iz, nyn, nzn);
-        xi[0]   = x[i] - XN_flat[flat_idx];
+        int flatID = get_idx(ix-1, iy, iz, nyn, nzn);
+        xi[0]   = x[i] - XN_flat[flatID];
 
-        flat_idx = get_idx(ix, iy-1, iz, nyn, nzn);
-        eta[0]  = y[i] - YN_flat[flat_idx];
+        flatID = get_idx(ix, iy-1, iz, nyn, nzn);
+        eta[0]  = y[i] - YN_flat[flatID];
 
-        flat_idx = get_idx(ix, iy, iz-1, nyn, nzn);
-        zeta[0] = z[i] - ZN_flat[flat_idx];
+        flatID = get_idx(ix, iy, iz-1, nyn, nzn);
+        zeta[0] = z[i] - ZN_flat[flatID];
 
-        flat_idx = get_idx(ix, iy, iz, nyn, nzn);
-        xi[1]   = XN_flat[flat_idx] - x[i];
-        eta[1]  = YN_flat[flat_idx] - y[i];
-        zeta[1] = ZN_flat[flat_idx] - z[i];
+        flatID = get_idx(ix, iy, iz, nyn, nzn);
+        xi[1]   = XN_flat[flatID] - x[i];
+        eta[1]  = YN_flat[flatID] - y[i];
+        zeta[1] = ZN_flat[flatID] - z[i];
 
         for (int ii = 0; ii < 2; ii++)
             for (int jj = 0; jj < 2; jj++)
@@ -310,13 +310,13 @@ __global__ void MOVER_KERNEL_BRUTEFORCE(FPpart* x, FPpart* y, FPpart* z, FPpart*
             for (int jj=0; jj < 2; jj++)
                 for(int kk=0; kk < 2; kk++){
 
-                    flat_idx = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
-                    Exl += weight[ii][jj][kk]*Ex_flat[flat_idx];
-                    Eyl += weight[ii][jj][kk]*Ey_flat[flat_idx];
-                    Ezl += weight[ii][jj][kk]*Ez_flat[flat_idx];
-                    Bxl += weight[ii][jj][kk]*Bxn_flat[flat_idx];
-                    Byl += weight[ii][jj][kk]*Byn_flat[flat_idx];
-                    Bzl += weight[ii][jj][kk]*Bzn_flat[flat_idx];
+                    flatID = get_idx(ix-ii, iy-jj, iz-kk, nyn, nzn);
+                    Exl += weight[ii][jj][kk]*Ex_flat[flatID];
+                    Eyl += weight[ii][jj][kk]*Ey_flat[flatID];
+                    Ezl += weight[ii][jj][kk]*Ez_flat[flatID];
+                    Bxl += weight[ii][jj][kk]*Bxn_flat[flatID];
+                    Byl += weight[ii][jj][kk]*Byn_flat[flatID];
+                    Bzl += weight[ii][jj][kk]*Bzn_flat[flatID];
             
         } // end interpolation
         
